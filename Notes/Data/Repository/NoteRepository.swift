@@ -46,18 +46,20 @@ extension NoteRepository {
     }
 
     func update(title: String? = nil, for note: Note) throws {
-        var entity = NoteEntity(from: note)
-        var changed = false
+        try database.queue.write { db in
+            guard var entity = try NoteEntity.fetchOne(db, key: note.id) else {
+                return
+            }
 
-        if let title, entity.title != title {
-            entity.title = title
-            changed = true
-        }
-
-        if changed {
-            entity.updatedAt = .now
-            try database.queue.write { db in
-                try entity.update(db)
+            try entity.updateChanges(db) {
+                var changed = false
+                if let title, $0.title != title {
+                    $0.title = title
+                    changed = true
+                }
+                if changed {
+                    $0.updatedAt = .now
+                }
             }
         }
     }
@@ -94,18 +96,20 @@ extension NoteRepository {
     }
 
     func updateAttachment(data: String? = nil, for attachment: NoteAttachment) throws {
-        var entity = NoteAttachmentEntity(from: attachment)
-        var changed = false
+        try database.queue.write { db in
+            guard var entity = try NoteAttachmentEntity.fetchOne(db, key: attachment.id) else {
+                return
+            }
 
-        if let data, entity.data != data {
-            entity.data = data
-            changed = true
-        }
-
-        if changed {
-            entity.updatedAt = .now
-            try database.queue.write { db in
-                try entity.update(db)
+            try entity.updateChanges(db) {
+                var changed = false
+                if let data, $0.data != data {
+                    $0.data = data
+                    changed = true
+                }
+                if changed {
+                    $0.updatedAt = .now
+                }
             }
         }
     }
