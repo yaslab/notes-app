@@ -29,13 +29,21 @@ struct NoteContentEditorView: View {
     func content(note: Note) -> some View {
         ScrollView {
             LazyVStack {
-                TextField(
-                    "Title",
-                    text: Binding(
-                        get: { note.title },
-                        set: { noteContentModel.onTitleUpdate($0, for: note) }
+                VStack {
+                    TextField(
+                        "Title",
+                        text: Binding(
+                            get: { note.title },
+                            set: { noteContentModel.onTitleUpdate($0, for: note) }
+                        )
                     )
-                )
+
+                    HStack {
+                        Spacer()
+                        Text(note.updatedAt.formatted())
+                    }
+                    .font(.caption)
+                }
 
                 ForEach(noteContentModel.attachments) { attachment in
                     NoteContentAttachmentEditor(attachment: attachment)

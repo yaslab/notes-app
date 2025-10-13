@@ -29,11 +29,18 @@ struct NoteAttachmentEntity: Codable, FetchableRecord, PersistableRecord {
         request(for: NoteAttachmentEntity.notes)
     }
 
+    enum Columns {
+        static let type = Column("type")
+        static let data = Column("data")
+        static let createdAt = Column("createdAt")
+        static let updatedAt = Column("updatedAt")
+    }
+
     var id: UUID
     var type: String
     var data: String
     var createdAt: Date
-    var updatedAt: Date?
+    var updatedAt: Date
 
     var noteId: UUID
 }

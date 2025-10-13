@@ -12,11 +12,11 @@ struct NoteAttachment: Identifiable, Hashable, Sendable {
     var type: String
     var data: String
     var createdAt: Date
-    var updatedAt: Date?
+    var updatedAt: Date
 
     var noteId: UUID
 
-    nonisolated init(id: UUID, type: String, data: String, createdAt: Date, updatedAt: Date?, belongsTo noteId: UUID) {
+    nonisolated init(id: UUID, type: String, data: String, createdAt: Date, updatedAt: Date, belongsTo noteId: UUID) {
         self.id = id
         self.type = type
         self.data = data

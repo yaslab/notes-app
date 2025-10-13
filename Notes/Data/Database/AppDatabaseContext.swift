@@ -26,14 +26,14 @@ class AppDatabaseContext {
                     t.primaryKey("id", .text)
                     t.column("title", .text).notNull()
                     t.column("createdAt", .double).notNull()
-                    t.column("updatedAt", .double)
+                    t.column("updatedAt", .double).notNull()
                 }
                 try db.create(table: NoteAttachmentEntity.databaseTableName, options: .ifNotExists) { t in
                     t.primaryKey("id", .text)
                     t.column("type", .text).notNull()
                     t.column("data", .text).notNull()
                     t.column("createdAt", .double).notNull()
-                    t.column("updatedAt", .double)
+                    t.column("updatedAt", .double).notNull()
                     t.belongsTo(NoteEntity.databaseTableName, onDelete: .cascade).notNull()
                 }
             }
@@ -49,6 +49,7 @@ extension AppDatabaseContext {
     static func path() throws -> String {
         let fm: FileManager = .default
         let dir = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appending(component: "Database")
         try fm.createDirectory(at: dir, withIntermediateDirectories: true)
         let file = dir.appending(component: "notes.sqlite")
 

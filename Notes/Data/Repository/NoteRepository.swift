@@ -19,7 +19,7 @@ class NoteRepository {
 
 extension NoteRepository {
     var publisher: AnyPublisher<[Note], Error> {
-        let observation = ValueObservation.tracking { try NoteEntity.fetchAll($0) }
+        let observation = ValueObservation.tracking { try NoteEntity.order(\.updatedAt.desc).fetchAll($0) }
         return observation.publisher(in: database.queue)
             .map { $0.map { $0.toModel() } }
             .eraseToAnyPublisher()
@@ -32,11 +32,12 @@ extension NoteRepository {
     }
 
     func create(title: String) throws {
+        let date = Date()
         let entity = NoteEntity(
             id: UUID(),
             title: title,
-            createdAt: .now,
-            updatedAt: nil
+            createdAt: date,
+            updatedAt: date
         )
 
         try database.queue.write { db in
@@ -77,12 +78,13 @@ extension NoteRepository {
     }
 
     func createAttachment(type: String, data: String, to note: Note) throws {
+        let date = Date()
         let entity = NoteAttachmentEntity(
             id: UUID(),
             type: type,
             data: data,
-            createdAt: .now,
-            updatedAt: nil,
+            createdAt: date,
+            updatedAt: date,
             noteId: note.id
         )
 
