@@ -10,6 +10,8 @@ import SwiftUI
 struct NoteContentEditorView: View {
     @Environment(NoteContentViewModel.self) var noteContentModel: NoteContentViewModel
 
+    @State var isDueDatePickerPresented: Bool = false
+
     let id: UUID
 
     var body: some View {
@@ -30,6 +32,27 @@ struct NoteContentEditorView: View {
         ScrollView {
             LazyVStack {
                 VStack {
+                    HStack {
+                        Text("Due Date")
+                        if let dueDate = note.dueDate {
+                            Text(dueDate.rawValue)
+                        }
+                        Button("Set") {
+                            isDueDatePickerPresented = true
+                        }
+                        .popover(isPresented: $isDueDatePickerPresented) {
+                            NoteContentDueDatePicker(
+                                onSubmit: { date in
+                                    noteContentModel.onDueDateUpdate(date, for: note)
+                                }
+                            )
+                            .padding()
+                        }
+                        Button("Clear") {
+                            noteContentModel.onDueDateUpdate(nil, for: note)
+                        }
+                    }
+
                     TextField(
                         "Title",
                         text: Binding(

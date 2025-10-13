@@ -49,6 +49,20 @@ class NoteContentViewModel {
         }
     }
 
+    func onDueDateUpdate(_ newValue: DateOnly?, for note: Note) {
+        do {
+            if let newValue {
+                try noteRepository.update(dueDate: newValue, for: note)
+            } else {
+                try noteRepository.setDueDateToNull(for: note)
+            }
+            try syncNote(id: note.id)
+        } catch {
+            // TODO: error handling
+            print(error)
+        }
+    }
+
     func onAttachmentDataUpdate(_ newValue: String, for attachment: NoteAttachment) {
         do {
             try noteRepository.updateAttachment(data: newValue, for: attachment)

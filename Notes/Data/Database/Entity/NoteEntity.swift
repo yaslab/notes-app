@@ -37,6 +37,7 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
 
     var id: UUID
     var title: String
+    var dueDate: DateOnly?
     var createdAt: Date
     var updatedAt: Date
 }
@@ -45,6 +46,7 @@ extension NoteEntity {
     init(from model: Note) {
         self.id = model.id
         self.title = model.title
+        self.dueDate = model.dueDate
         self.createdAt = model.createdAt
         self.updatedAt = model.updatedAt
     }
@@ -53,6 +55,7 @@ extension NoteEntity {
         return Note(
             id: id,
             title: title,
+            dueDate: dueDate,
             createdAt: createdAt,
             updatedAt: updatedAt
         )

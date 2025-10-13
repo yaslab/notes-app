@@ -7,11 +7,15 @@
 
 import Foundation
 import GRDB
+import Logging
 
 class AppDatabaseContext {
+    private let logger: Logger
     let queue: DatabaseQueue
 
-    init(isInMemory: Bool = false) {
+    init(logger: Logger, isInMemory: Bool = false) {
+        self.logger = logger
+
         do {
             let queue: DatabaseQueue
 
@@ -21,10 +25,13 @@ class AppDatabaseContext {
                 queue = try DatabaseQueue(path: AppDatabaseContext.path())
             }
 
+            logger.info("Database file path: \(queue.path)")
+
             try queue.write { db in
                 try db.create(table: NoteEntity.databaseTableName, options: .ifNotExists) { t in
                     t.primaryKey("id", .text)
                     t.column("title", .text).notNull()
+                    t.column("dueDate", .text)
                     t.column("createdAt", .double).notNull()
                     t.column("updatedAt", .double).notNull()
                 }
@@ -52,9 +59,6 @@ extension AppDatabaseContext {
             .appending(component: "Database")
         try fm.createDirectory(at: dir, withIntermediateDirectories: true)
         let file = dir.appending(component: "notes.sqlite")
-
-        // For debugging
-        print("Database file path: \(file.path(percentEncoded: false))")
 
         return file.path(percentEncoded: false)
     }

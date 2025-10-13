@@ -45,7 +45,7 @@ extension NoteRepository {
         }
     }
 
-    func update(title: String? = nil, for note: Note) throws {
+    func update(title: String? = nil, dueDate: DateOnly? = nil, for note: Note) throws {
         try database.queue.write { db in
             guard var entity = try NoteEntity.fetchOne(db, key: note.id) else {
                 return
@@ -57,9 +57,26 @@ extension NoteRepository {
                     $0.title = title
                     changed = true
                 }
+                if let dueDate, $0.dueDate != dueDate {
+                    $0.dueDate = dueDate
+                    changed = true
+                }
                 if changed {
                     $0.updatedAt = .now
                 }
+            }
+        }
+    }
+
+    func setDueDateToNull(for note: Note) throws {
+        try database.queue.write { db in
+            guard var entity = try NoteEntity.fetchOne(db, key: note.id) else {
+                return
+            }
+
+            try entity.updateChanges(db) {
+                $0.dueDate = nil
+                $0.updatedAt = .now
             }
         }
     }

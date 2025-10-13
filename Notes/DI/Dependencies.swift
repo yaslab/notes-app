@@ -28,7 +28,9 @@ class DependenciesImpl: Dependencies {
         return singleLogger
     }
 
-    private lazy var singleAppDatabaseContext = AppDatabaseContext()
+    private lazy var singleAppDatabaseContext = AppDatabaseContext(
+        logger: resolve()
+    )
 
     func resolve() -> AppDatabaseContext {
         return singleAppDatabaseContext
