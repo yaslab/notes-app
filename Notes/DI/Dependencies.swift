@@ -5,9 +5,13 @@
 //  Created by Yasuhiro Hatta on 2025/09/28.
 //
 
+import Logging
+
 let dependencies: Dependencies = DependenciesImpl()
 
 protocol Dependencies {
+    func resolve() -> Logger
+
     func resolve() -> AppDatabaseContext
 
     func resolve() -> NoteRepository
@@ -18,6 +22,12 @@ protocol Dependencies {
 }
 
 class DependenciesImpl: Dependencies {
+    private lazy var singleLogger = AppLogger.make()
+
+    func resolve() -> Logger {
+        return singleLogger
+    }
+
     private lazy var singleAppDatabaseContext = AppDatabaseContext()
 
     func resolve() -> AppDatabaseContext {
@@ -38,6 +48,7 @@ class DependenciesImpl: Dependencies {
 
     func resolve() -> NotesViewModel {
         return NotesViewModel(
+            logger: resolve(),
             noteRepository: resolve()
         )
     }
