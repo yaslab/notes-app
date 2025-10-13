@@ -23,18 +23,15 @@ class NotesViewModel {
     // MARK: - Subscriptions
 
     @ObservationIgnored
-    private var cancellables = Set<AnyCancellable>()
+    private var cancellables: Set<AnyCancellable> = []
 
     private func bind() {
-        var cancellables: Set<AnyCancellable> = []
+        cancellables = []
 
-        cancellables.insert(
-            noteRepository.publisher
-                .assertNoFailure()  // FIXME: Handle error properly
-                .assign(to: \.notes, on: self)
-        )
-
-        self.cancellables = cancellables
+        noteRepository.publisher
+            .assertNoFailure()  // FIXME: Handle error properly
+            .assign(to: \.notes, on: self)
+            .store(in: &cancellables)
     }
 
     // MARK: - States
