@@ -12,7 +12,7 @@ struct NoteContentEditorView: View {
 
     @State var isDueDatePickerPresented: Bool = false
 
-    let id: UUID
+    let id: Note.ID
 
     var body: some View {
         if let note = noteContentModel.note {
@@ -80,9 +80,6 @@ struct NoteContentEditorView: View {
             ToolbarItem {
                 attachButton(note: note)
             }
-            ToolbarItem {
-                saveButton()
-            }
         }
     }
 
@@ -93,11 +90,6 @@ struct NoteContentEditorView: View {
             }
             Button("URL", systemImage: "text.badge.plus") {
             }
-        }
-    }
-
-    func saveButton() -> some View {
-        Button("Save", systemImage: "square.and.arrow.down") {
         }
     }
 }

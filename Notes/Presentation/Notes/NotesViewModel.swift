@@ -56,7 +56,7 @@ class NotesViewModel {
         }
     }
 
-    func delete(id: UUID) {
+    func delete(id: Note.ID) {
         logger.trace()
 
         do {

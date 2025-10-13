@@ -25,9 +25,9 @@ extension NoteRepository {
             .eraseToAnyPublisher()
     }
 
-    func fetchOne(id: UUID) throws -> Note? {
+    func fetchOne(id: Note.ID) throws -> Note? {
         try database.queue.read { db in
-            try NoteEntity.fetchOne(db, key: id)?.toModel()
+            try NoteEntity.fetchOne(db, key: id.rawValue)?.toModel()
         }
     }
 
@@ -45,9 +45,9 @@ extension NoteRepository {
         }
     }
 
-    func update(title: String? = nil, dueDate: DateOnly? = nil, for note: Note) throws {
+    func update(title: String? = nil, dueDate: DateOnly? = nil, for noteId: Note.ID) throws {
         try database.queue.write { db in
-            guard var entity = try NoteEntity.fetchOne(db, key: note.id) else {
+            guard var entity = try NoteEntity.fetchOne(db, key: noteId.rawValue) else {
                 return
             }
 
@@ -68,9 +68,9 @@ extension NoteRepository {
         }
     }
 
-    func setDueDateToNull(for note: Note) throws {
+    func setDueDateToNull(for noteId: Note.ID) throws {
         try database.queue.write { db in
-            guard var entity = try NoteEntity.fetchOne(db, key: note.id) else {
+            guard var entity = try NoteEntity.fetchOne(db, key: noteId.rawValue) else {
                 return
             }
 
@@ -81,9 +81,9 @@ extension NoteRepository {
         }
     }
 
-    func delete(id: UUID) throws {
+    func delete(id: Note.ID) throws {
         try database.queue.write { db in
-            _ = try NoteEntity.deleteOne(db, key: id)
+            _ = try NoteEntity.deleteOne(db, key: id.rawValue)
         }
     }
 }
@@ -96,7 +96,7 @@ extension NoteRepository {
         }
     }
 
-    func createAttachment(type: String, data: String, to note: Note) throws {
+    func createAttachment(type: NoteAttachmentType, data: String, to noteId: Note.ID) throws {
         let date = Date()
         let entity = NoteAttachmentEntity(
             id: UUID(),
@@ -104,7 +104,7 @@ extension NoteRepository {
             data: data,
             createdAt: date,
             updatedAt: date,
-            noteId: note.id
+            noteId: noteId.rawValue
         )
 
         try database.queue.write { db in
@@ -112,9 +112,9 @@ extension NoteRepository {
         }
     }
 
-    func updateAttachment(data: String? = nil, for attachment: NoteAttachment) throws {
+    func updateAttachment(data: String? = nil, for id: NoteAttachment.ID) throws {
         try database.queue.write { db in
-            guard var entity = try NoteAttachmentEntity.fetchOne(db, key: attachment.id) else {
+            guard var entity = try NoteAttachmentEntity.fetchOne(db, key: id.rawValue) else {
                 return
             }
 
@@ -131,9 +131,9 @@ extension NoteRepository {
         }
     }
 
-    func deleteAttachment(for attachment: NoteAttachment) throws -> Bool {
+    func deleteAttachment(for id: NoteAttachment.ID) throws -> Bool {
         try database.queue.write { db in
-            try NoteAttachmentEntity.deleteOne(db, key: attachment.id)
+            try NoteAttachmentEntity.deleteOne(db, key: id.rawValue)
         }
     }
 }

@@ -31,6 +31,7 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
 
     enum Columns {
         static let title = Column("title")
+        static let dueDate = Column("dueDate")
         static let createdAt = Column("createdAt")
         static let updatedAt = Column("updatedAt")
     }
@@ -44,7 +45,7 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
 
 extension NoteEntity {
     init(from model: Note) {
-        self.id = model.id
+        self.id = model.id.rawValue
         self.title = model.title
         self.dueDate = model.dueDate
         self.createdAt = model.createdAt
@@ -53,7 +54,7 @@ extension NoteEntity {
 
     func toModel() -> Note {
         return Note(
-            id: id,
+            id: Note.ID(rawValue: id),
             title: title,
             dueDate: dueDate,
             createdAt: createdAt,

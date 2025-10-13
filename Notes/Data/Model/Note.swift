@@ -8,13 +8,21 @@
 import Foundation
 
 struct Note: Identifiable, Hashable, Sendable {
-    var id: UUID
+    struct ID: RawRepresentable, Hashable, Sendable {
+        var rawValue: UUID
+
+        nonisolated init(rawValue: UUID = UUID()) {
+            self.rawValue = rawValue
+        }
+    }
+
+    var id: ID
     var title: String
     var dueDate: DateOnly?
     var createdAt: Date
     var updatedAt: Date
 
-    nonisolated init(id: UUID, title: String, dueDate: DateOnly?, createdAt: Date, updatedAt: Date) {
+    nonisolated init(id: ID, title: String, dueDate: DateOnly?, createdAt: Date, updatedAt: Date) {
         self.id = id
         self.title = title
         self.dueDate = dueDate

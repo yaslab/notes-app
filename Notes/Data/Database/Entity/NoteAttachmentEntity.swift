@@ -37,7 +37,7 @@ struct NoteAttachmentEntity: Codable, FetchableRecord, PersistableRecord {
     }
 
     var id: UUID
-    var type: String
+    var type: NoteAttachmentType
     var data: String
     var createdAt: Date
     var updatedAt: Date
@@ -47,23 +47,23 @@ struct NoteAttachmentEntity: Codable, FetchableRecord, PersistableRecord {
 
 extension NoteAttachmentEntity {
     init(from model: NoteAttachment) {
-        self.id = model.id
+        self.id = model.id.rawValue
         self.type = model.type
         self.data = model.data
         self.createdAt = model.createdAt
         self.updatedAt = model.updatedAt
 
-        self.noteId = model.noteId
+        self.noteId = model.noteId.rawValue
     }
 
     func toModel() -> NoteAttachment {
         NoteAttachment(
-            id: id,
+            id: NoteAttachment.ID(rawValue: id),
             type: type,
             data: data,
             createdAt: createdAt,
             updatedAt: updatedAt,
-            belongsTo: noteId
+            belongsTo: Note.ID(rawValue: noteId)
         )
     }
 }

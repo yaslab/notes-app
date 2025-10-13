@@ -8,15 +8,23 @@
 import Foundation
 
 struct NoteAttachment: Identifiable, Hashable, Sendable {
-    var id: UUID
-    var type: String
+    struct ID: RawRepresentable, Hashable, Sendable {
+        var rawValue: UUID
+
+        nonisolated init(rawValue: UUID = UUID()) {
+            self.rawValue = rawValue
+        }
+    }
+
+    var id: ID
+    var type: NoteAttachmentType
     var data: String
     var createdAt: Date
     var updatedAt: Date
 
-    var noteId: UUID
+    var noteId: Note.ID
 
-    nonisolated init(id: UUID, type: String, data: String, createdAt: Date, updatedAt: Date, belongsTo noteId: UUID) {
+    nonisolated init(id: ID, type: NoteAttachmentType, data: String, createdAt: Date, updatedAt: Date, belongsTo noteId: Note.ID) {
         self.id = id
         self.type = type
         self.data = data

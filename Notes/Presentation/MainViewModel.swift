@@ -12,5 +12,5 @@ import Observation
 class MainViewModel {
     // MARK: - States
 
-    var selection: UUID? = nil
+    var selection: Note.ID? = nil
 }
