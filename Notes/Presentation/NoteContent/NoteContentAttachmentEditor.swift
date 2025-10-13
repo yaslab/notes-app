@@ -13,7 +13,7 @@ struct NoteContentAttachmentEditor: View {
     @State var text: String = ""
     @State var selection: TextSelection? = nil
 
-    @State var aaaa: Bool = false
+    @State var isConfirmationDialogPresented: Bool = false
 
     let attachment: NoteAttachment
 
@@ -22,9 +22,9 @@ struct NoteContentAttachmentEditor: View {
             HStack {
                 Spacer()
                 Button("Delete", systemImage: "trash", role: .destructive) {
-                    aaaa = true
+                    isConfirmationDialogPresented = true
                 }
-                .confirmationDialog(deletionConfirmationMessage(), isPresented: $aaaa) {
+                .confirmationDialog(deletionConfirmationMessage(), isPresented: $isConfirmationDialogPresented) {
                     Button("Delete", role: .destructive) {
                         noteContentModel.deleteAttachment(attachment)
                     }
