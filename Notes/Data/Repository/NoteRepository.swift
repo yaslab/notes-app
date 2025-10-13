@@ -26,20 +26,21 @@ extension NoteRepository {
     }
 
     func fetchOne(id: UUID) throws -> Note? {
-        return try database.queue.read { db in
-            guard let note = try NoteEntity.fetchOne(db, key: id) else {
-                return nil
-            }
-
-            let attachments = try note.attachments.fetchAll(db)
-
-            return note.toModel(attachments: attachments)
+        try database.queue.read { db in
+            try NoteEntity.fetchOne(db, key: id)?.toModel()
         }
     }
 
     func create(title: String) throws {
+        let entity = NoteEntity(
+            id: UUID(),
+            title: title,
+            createdAt: .now,
+            updatedAt: nil
+        )
+
         try database.queue.write { db in
-            try NoteEntity(id: UUID(), title: title).insert(db)
+            try entity.insert(db)
         }
     }
 
@@ -53,6 +54,7 @@ extension NoteRepository {
         }
 
         if changed {
+            entity.updatedAt = .now
             try database.queue.write { db in
                 try entity.update(db)
             }
@@ -67,9 +69,25 @@ extension NoteRepository {
 }
 
 extension NoteRepository {
+    func fetchAttachments(for note: Note) throws -> [NoteAttachment] {
+        try database.queue.read { db in
+            try NoteEntity(from: note).attachments.fetchAll(db)
+                .map { $0.toModel() }
+        }
+    }
+
     func createAttachment(type: String, data: String, to note: Note) throws {
+        let entity = NoteAttachmentEntity(
+            id: UUID(),
+            type: type,
+            data: data,
+            createdAt: .now,
+            updatedAt: nil,
+            noteId: note.id
+        )
+
         try database.queue.write { db in
-            try NoteAttachmentEntity(id: UUID(), type: type, data: data, noteId: note.id).insert(db)
+            try entity.insert(db)
         }
     }
 
@@ -83,6 +101,7 @@ extension NoteRepository {
         }
 
         if changed {
+            entity.updatedAt = .now
             try database.queue.write { db in
                 try entity.update(db)
             }

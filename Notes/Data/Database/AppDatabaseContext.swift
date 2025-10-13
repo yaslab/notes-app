@@ -25,11 +25,15 @@ class AppDatabaseContext {
                 try db.create(table: NoteEntity.databaseTableName, options: .ifNotExists) { t in
                     t.primaryKey("id", .text)
                     t.column("title", .text).notNull()
+                    t.column("createdAt", .double).notNull()
+                    t.column("updatedAt", .double)
                 }
                 try db.create(table: NoteAttachmentEntity.databaseTableName, options: .ifNotExists) { t in
                     t.primaryKey("id", .text)
                     t.column("type", .text).notNull()
                     t.column("data", .text).notNull()
+                    t.column("createdAt", .double).notNull()
+                    t.column("updatedAt", .double)
                     t.belongsTo(NoteEntity.databaseTableName, onDelete: .cascade).notNull()
                 }
             }

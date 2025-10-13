@@ -37,7 +37,7 @@ struct NoteContentEditorView: View {
                     )
                 )
 
-                ForEach(note.attachments) { attachment in
+                ForEach(noteContentModel.attachments) { attachment in
                     NoteContentAttachmentEditor(attachment: attachment)
                 }
                 .scrollIndicators(.never)

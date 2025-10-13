@@ -11,6 +11,18 @@ import GRDB
 struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
     static let databaseTableName = "note"
 
+    static func databaseUUIDEncodingStrategy(for column: String) -> DatabaseUUIDEncodingStrategy {
+        return .lowercaseString
+    }
+
+    static func databaseDateEncodingStrategy(for column: String) -> DatabaseDateEncodingStrategy {
+        return .timeIntervalSince1970
+    }
+
+    static func databaseDateDecodingStrategy(for column: String) -> DatabaseDateDecodingStrategy {
+        return .timeIntervalSince1970
+    }
+
     static let attachments = hasMany(NoteAttachmentEntity.self)
 
     var attachments: QueryInterfaceRequest<NoteAttachmentEntity> {
@@ -19,19 +31,24 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
 
     var id: UUID
     var title: String
+    var createdAt: Date
+    var updatedAt: Date?
 }
 
 extension NoteEntity {
     init(from model: Note) {
         self.id = model.id
         self.title = model.title
+        self.createdAt = model.createdAt
+        self.updatedAt = model.updatedAt
     }
 
-    func toModel(attachments: [NoteAttachmentEntity] = []) -> Note {
+    func toModel() -> Note {
         return Note(
             id: id,
             title: title,
-            attachments: attachments.map { $0.toModel() }
+            createdAt: createdAt,
+            updatedAt: updatedAt
         )
     }
 }

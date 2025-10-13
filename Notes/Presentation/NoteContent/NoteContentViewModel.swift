@@ -21,13 +21,13 @@ class NoteContentViewModel {
     // MARK: - States
 
     private(set) var note: Note? = nil
+    private(set) var attachments: [NoteAttachment] = []
 
     // MARK: - Events
 
     func onEditorAppear(id: UUID) {
         do {
-            let note = try noteRepository.fetchOne(id: id)
-            self.note = note
+            try syncNote(id: id)
         } catch {
             // TODO: error handling
             print(error)
@@ -36,12 +36,13 @@ class NoteContentViewModel {
 
     func onEditorDisappear() {
         self.note = nil
+        self.attachments = []
     }
 
     func onTitleUpdate(_ newValue: String, for note: Note) {
         do {
             try noteRepository.update(title: newValue, for: note)
-            self.note = try noteRepository.fetchOne(id: note.id)
+            try syncNote(id: note.id)
         } catch {
             // TODO: error handling
             print(error)
@@ -51,7 +52,7 @@ class NoteContentViewModel {
     func onAttachmentDataUpdate(_ newValue: String, for attachment: NoteAttachment) {
         do {
             try noteRepository.updateAttachment(data: newValue, for: attachment)
-            self.note = try noteRepository.fetchOne(id: attachment.noteId)
+            try syncNote(id: attachment.noteId)
 
             //            if let index = self.note?.attachments.firstIndex(of: attachment) {
             //                self.note?.attachments[index].data = newValue
@@ -67,7 +68,7 @@ class NoteContentViewModel {
     func appendNewAttachment(to note: Note) {
         do {
             try noteRepository.createAttachment(type: "text", data: "", to: note)
-            self.note = try noteRepository.fetchOne(id: note.id)
+            try syncNote(id: note.id)
         } catch {
             // TODO: error handling
             print(error)
@@ -77,10 +78,33 @@ class NoteContentViewModel {
     func deleteAttachment(_ attachment: NoteAttachment) {
         do {
             _ = try noteRepository.deleteAttachment(for: attachment)
-            self.note = try noteRepository.fetchOne(id: attachment.noteId)
+            try syncNote(id: attachment.noteId)
         } catch {
             // TODO: error handling
             print(error)
         }
+    }
+
+    // MARK: - UseCase
+
+    func fetchNote(id: UUID) throws -> (Note, [NoteAttachment])? {
+        guard let note = try noteRepository.fetchOne(id: id) else {
+            return nil
+        }
+
+        let attachments = try noteRepository.fetchAttachments(for: note)
+
+        return (note, attachments)
+    }
+
+    // MARK: Common
+
+    func syncNote(id: UUID) throws {
+        guard let (note, attachments) = try fetchNote(id: id) else {
+            return
+        }
+
+        self.note = note
+        self.attachments = attachments
     }
 }
