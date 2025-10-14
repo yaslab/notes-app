@@ -49,7 +49,7 @@ class NotesViewModel {
         logger.trace()
 
         do {
-            try noteRepository.create(title: title)
+            try noteRepository.createNote(title: title)
         } catch {
             // TODO: error handling
             logger.debug("\(error)")
@@ -60,7 +60,7 @@ class NotesViewModel {
         logger.trace()
 
         do {
-            try noteRepository.delete(id: id)
+            try noteRepository.deleteNote(by: id)
         } catch {
             // TODO: error handling
             logger.debug("\(error)")
@@ -72,7 +72,7 @@ class NotesViewModel {
 
         do {
             try indices.map { notes[$0].id }.forEach { id in
-                try noteRepository.delete(id: id)
+                try noteRepository.deleteNote(by: id)
             }
         } catch {
             // TODO: error handling

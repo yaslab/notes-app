@@ -13,9 +13,14 @@ class NoteContentViewModel {
     // MARK: - Dependencies
 
     private let noteRepository: NoteRepository
+    private let noteAttachmentRepository: NoteAttachmentRepository
 
-    init(noteRepository: NoteRepository) {
+    init(
+        noteRepository: NoteRepository,
+        noteAttachmentRepository: NoteAttachmentRepository
+    ) {
         self.noteRepository = noteRepository
+        self.noteAttachmentRepository = noteAttachmentRepository
     }
 
     // MARK: - States
@@ -41,7 +46,7 @@ class NoteContentViewModel {
 
     func onTitleUpdate(_ newValue: String, for note: Note) {
         do {
-            try noteRepository.update(title: newValue, for: note.id)
+            try noteRepository.updateNote(title: newValue, for: note.id)
             try syncNote(id: note.id)
         } catch {
             // TODO: error handling
@@ -52,7 +57,7 @@ class NoteContentViewModel {
     func onDueDateUpdate(_ newValue: DateOnly?, for note: Note) {
         do {
             if let newValue {
-                try noteRepository.update(dueDate: newValue, for: note.id)
+                try noteRepository.updateNote(dueDate: newValue, for: note.id)
             } else {
                 try noteRepository.setDueDateToNull(for: note.id)
             }
@@ -65,7 +70,7 @@ class NoteContentViewModel {
 
     func onAttachmentDataUpdate(_ newValue: String, for attachment: NoteAttachment) {
         do {
-            try noteRepository.updateAttachment(data: newValue, for: attachment.id)
+            try noteAttachmentRepository.updateAttachment(data: newValue, for: attachment.id)
             try syncNote(id: attachment.noteId)
 
             //            if let index = self.note?.attachments.firstIndex(of: attachment) {
@@ -81,7 +86,7 @@ class NoteContentViewModel {
 
     func appendNewAttachment(to note: Note) {
         do {
-            try noteRepository.createAttachment(type: .text, data: "", to: note.id)
+            try noteAttachmentRepository.createAttachment(type: .text, data: "", to: note.id)
             try syncNote(id: note.id)
         } catch {
             // TODO: error handling
@@ -91,7 +96,7 @@ class NoteContentViewModel {
 
     func deleteAttachment(_ attachment: NoteAttachment) {
         do {
-            _ = try noteRepository.deleteAttachment(for: attachment.id)
+            _ = try noteAttachmentRepository.deleteAttachment(by: attachment.id)
             try syncNote(id: attachment.noteId)
         } catch {
             // TODO: error handling
@@ -102,11 +107,11 @@ class NoteContentViewModel {
     // MARK: - UseCase
 
     func fetchNote(id: Note.ID) throws -> (Note, [NoteAttachment])? {
-        guard let note = try noteRepository.fetchOne(id: id) else {
+        guard let note = try noteRepository.fetchNote(by: id) else {
             return nil
         }
 
-        let attachments = try noteRepository.fetchAttachments(for: note)
+        let attachments = try noteAttachmentRepository.fetchAttachments(for: note)
 
         return (note, attachments)
     }

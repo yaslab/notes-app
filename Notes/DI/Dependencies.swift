@@ -15,6 +15,7 @@ protocol Dependencies {
     func resolve() -> AppDatabaseContext
 
     func resolve() -> NoteRepository
+    func resolve() -> NoteAttachmentRepository
 
     func resolve() -> MainViewModel
     func resolve() -> NotesViewModel
@@ -44,6 +45,14 @@ class DependenciesImpl: Dependencies {
         return singleNoteRepository
     }
 
+    private lazy var singleNoteAttachmentRepository = NoteAttachmentRepository(
+        database: resolve()
+    )
+
+    func resolve() -> NoteAttachmentRepository {
+        return singleNoteAttachmentRepository
+    }
+
     func resolve() -> MainViewModel {
         return MainViewModel()
     }
@@ -57,7 +66,8 @@ class DependenciesImpl: Dependencies {
 
     func resolve() -> NoteContentViewModel {
         return NoteContentViewModel(
-            noteRepository: resolve()
+            noteRepository: resolve(),
+            noteAttachmentRepository: resolve()
         )
     }
 }

@@ -25,13 +25,13 @@ extension NoteRepository {
             .eraseToAnyPublisher()
     }
 
-    func fetchOne(id: Note.ID) throws -> Note? {
+    func fetchNote(by id: Note.ID) throws -> Note? {
         try database.queue.read { db in
             try NoteEntity.fetchOne(db, key: id.rawValue)?.toModel()
         }
     }
 
-    func create(title: String) throws {
+    func createNote(title: String) throws {
         let date = Date()
         let entity = NoteEntity(
             id: UUID(),
@@ -45,7 +45,7 @@ extension NoteRepository {
         }
     }
 
-    func update(title: String? = nil, dueDate: DateOnly? = nil, for noteId: Note.ID) throws {
+    func updateNote(title: String? = nil, dueDate: DateOnly? = nil, for noteId: Note.ID) throws {
         try database.queue.write { db in
             guard var entity = try NoteEntity.fetchOne(db, key: noteId.rawValue) else {
                 return
@@ -81,59 +81,9 @@ extension NoteRepository {
         }
     }
 
-    func delete(id: Note.ID) throws {
+    func deleteNote(by id: Note.ID) throws {
         try database.queue.write { db in
             _ = try NoteEntity.deleteOne(db, key: id.rawValue)
-        }
-    }
-}
-
-extension NoteRepository {
-    func fetchAttachments(for note: Note) throws -> [NoteAttachment] {
-        try database.queue.read { db in
-            try NoteEntity(from: note).attachments.fetchAll(db)
-                .map { $0.toModel() }
-        }
-    }
-
-    func createAttachment(type: NoteAttachmentType, data: String, to noteId: Note.ID) throws {
-        let date = Date()
-        let entity = NoteAttachmentEntity(
-            id: UUID(),
-            type: type,
-            data: data,
-            createdAt: date,
-            updatedAt: date,
-            noteId: noteId.rawValue
-        )
-
-        try database.queue.write { db in
-            try entity.insert(db)
-        }
-    }
-
-    func updateAttachment(data: String? = nil, for id: NoteAttachment.ID) throws {
-        try database.queue.write { db in
-            guard var entity = try NoteAttachmentEntity.fetchOne(db, key: id.rawValue) else {
-                return
-            }
-
-            try entity.updateChanges(db) {
-                var changed = false
-                if let data, $0.data != data {
-                    $0.data = data
-                    changed = true
-                }
-                if changed {
-                    $0.updatedAt = .now
-                }
-            }
-        }
-    }
-
-    func deleteAttachment(for id: NoteAttachment.ID) throws -> Bool {
-        try database.queue.write { db in
-            try NoteAttachmentEntity.deleteOne(db, key: id.rawValue)
         }
     }
 }
