@@ -84,9 +84,9 @@ class NoteContentViewModel {
 
     // MARK: - Actions
 
-    func appendNewAttachment(to note: Note) {
+    func appendNewAttachment(type: NoteAttachmentType, to note: Note) {
         do {
-            try noteAttachmentRepository.createAttachment(type: .text, data: "", to: note.id)
+            try noteAttachmentRepository.createAttachment(type: type, data: "", to: note.id)
             try syncNote(id: note.id)
         } catch {
             // TODO: error handling

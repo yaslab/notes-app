@@ -34,7 +34,7 @@ struct NotesView: View {
     }
 
     func appendButton() -> some View {
-        Button("Add", systemImage: "document.badge.plus") {
+        Button("Add", systemImage: "square.and.pencil") {
             model.createNote(title: "")
         }
     }

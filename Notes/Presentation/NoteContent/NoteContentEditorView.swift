@@ -32,10 +32,20 @@ struct NoteContentEditorView: View {
         ScrollView {
             LazyVStack {
                 VStack {
-                    HStack {
-                        Text("Due Date")
+                    HStack(spacing: 0) {
+                        Text("Created: \(note.createdAt.formatted())")
+                        if note.createdAt != note.updatedAt {
+                            Text(", Updated: \(note.updatedAt.formatted())")
+                        }
+                        Spacer()
+                    }
+
+                    HStack(spacing: 0) {
+                        Text("Due Date: ")
                         if let dueDate = note.dueDate {
                             Text(dueDate.rawValue)
+                        } else {
+                            Text("-")
                         }
                         Button("Set") {
                             isDueDatePickerPresented = true
@@ -51,6 +61,7 @@ struct NoteContentEditorView: View {
                         Button("Clear") {
                             noteContentModel.onDueDateUpdate(nil, for: note)
                         }
+                        Spacer()
                     }
 
                     TextField(
@@ -60,36 +71,26 @@ struct NoteContentEditorView: View {
                             set: { noteContentModel.onTitleUpdate($0, for: note) }
                         )
                     )
-
-                    HStack {
-                        Spacer()
-                        Text(note.updatedAt.formatted())
-                    }
-                    .font(.caption)
                 }
 
                 ForEach(noteContentModel.attachments) { attachment in
                     NoteContentAttachmentEditor(attachment: attachment)
                 }
                 .scrollIndicators(.never)
+
+                HStack {
+                    Image(systemName: "plus")
+                    Button("Text") {
+                        noteContentModel.appendNewAttachment(type: .text, to: note)
+                    }
+                    Button("URL") {
+                        noteContentModel.appendNewAttachment(type: .url, to: note)
+                    }
+                    Spacer()
+                }
             }
             .padding()
         }
         .font(.body.monospaced())
-        .toolbar {
-            ToolbarItem {
-                attachButton(note: note)
-            }
-        }
-    }
-
-    func attachButton(note: Note) -> some View {
-        Menu("Attach") {
-            Button("Free Text", systemImage: "text.badge.plus") {
-                noteContentModel.appendNewAttachment(to: note)
-            }
-            Button("URL", systemImage: "text.badge.plus") {
-            }
-        }
     }
 }

@@ -10,6 +10,8 @@ import SwiftUI
 struct NoteContentAttachmentEditor: View {
     @Environment(NoteContentViewModel.self) var noteContentModel: NoteContentViewModel
 
+    @Environment(\.openURL) var openURL
+
     @State var text: String = ""
     @State var selection: TextSelection? = nil
 
@@ -20,7 +22,21 @@ struct NoteContentAttachmentEditor: View {
     var body: some View {
         VStack {
             HStack {
+                switch attachment.type {
+                case .text:
+                    Text("Notes")
+                case .url:
+                    Text("URL")
+                }
                 Spacer()
+                if case .url = attachment.type {
+                    Button("Open") {
+                        if let url = URL(string: attachment.data) {
+                            // FIXME: Only allow http and https
+                            openURL(url)
+                        }
+                    }
+                }
                 Button("Delete", systemImage: "trash", role: .destructive) {
                     isConfirmationDialogPresented = true
                 }
