@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainView: View {
-    @State var model: MainViewModel = dependencies.resolve()
+    @State var viewModel: MainViewModel = dependencies.resolve()
 
     var body: some View {
         NavigationSplitView {
@@ -16,6 +16,6 @@ struct MainView: View {
         } detail: {
             NoteContentView()
         }
-        .environment(model)
+        .environment(viewModel)
     }
 }

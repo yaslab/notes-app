@@ -8,19 +8,16 @@
 import SwiftUI
 
 struct NoteContentView: View {
-    @Environment(MainViewModel.self) var mainModel: MainViewModel
-
-    @State var model: NoteContentViewModel = dependencies.resolve()
+    @Environment(MainViewModel.self) var mainViewModel: MainViewModel
 
     var body: some View {
         NavigationStack {
-            if let id = mainModel.selection {
+            if let id = mainViewModel.selection {
                 NoteContentEditorView(id: id)
                     .id(id)
             } else {
                 NoteContentEmptyView()
             }
         }
-        .environment(model)
     }
 }

@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct NoteContentAttachmentEditor: View {
-    @Environment(NoteContentViewModel.self) var noteContentModel: NoteContentViewModel
+    @Environment(NoteContentViewModel.self) var viewModel: NoteContentViewModel
 
     @Environment(\.openURL) var openURL
 
-    @State var text: String = ""
-    @State var selection: TextSelection? = nil
-
     @State var isConfirmationDialogPresented: Bool = false
 
-    let attachment: NoteAttachment
+    @Binding var attachment: NoteAttachment
 
     var body: some View {
         VStack {
@@ -42,29 +39,29 @@ struct NoteContentAttachmentEditor: View {
                 }
                 .confirmationDialog(deletionConfirmationMessage(), isPresented: $isConfirmationDialogPresented) {
                     Button("Delete", role: .destructive) {
-                        noteContentModel.deleteAttachment(attachment)
+                        viewModel.deleteAttachment(attachment)
                     }
                     Button("Cancel", role: .cancel) {
                     }
                 }
             }
-            TextEditor(text: $text, selection: $selection)
+            TextEditor(text: $attachment.data)
                 .textEditorStyle(.plain)
+                .font(.body.monospaced())
                 .frame(minHeight: 88)
                 .background {
                     RoundedRectangle(cornerRadius: 8)
                         .strokeBorder(.separator)
                 }
         }
-        .onAppear {
-            text = attachment.data
-        }
-        .onChange(of: text) { oldValue, newValue in
-            noteContentModel.onAttachmentDataUpdate(newValue, for: attachment)
+        .onChange(of: attachment.data) { oldValue, newValue in
+            viewModel.onAttachmentDataUpdate(for: attachment)
         }
     }
 
     func deletionConfirmationMessage() -> String {
+        let text = attachment.data
+
         var message = "Delete \""
         if text.count <= 128 {
             message += text

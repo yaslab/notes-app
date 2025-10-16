@@ -8,25 +8,25 @@
 import SwiftUI
 
 struct NotesView: View {
-    @Environment(MainViewModel.self) var mainModel: MainViewModel
+    @Environment(MainViewModel.self) var mainViewModel: MainViewModel
 
-    @State var model: NotesViewModel = dependencies.resolve()
+    @State var viewModel: NotesViewModel = dependencies.resolve()
 
     var body: some View {
         NavigationStack {
-            @Bindable var mainModel = mainModel
-            List(selection: $mainModel.selection) {
-                ForEach(model.notes) { item in
+            @Bindable var mainViewModel = mainViewModel
+            List(selection: $mainViewModel.selection) {
+                ForEach(viewModel.notes) { item in
                     Text(title(for: item))
                         .contextMenu {
                             Button("Delete", systemImage: "trash") {
-                                model.delete(id: item.id)
+                                viewModel.delete(id: item.id)
                             }
                         }
                         .id(item.id)
                 }
                 .onDelete { indices in
-                    model.delete(indices: indices)
+                    viewModel.delete(indices: indices)
                 }
             }
             .toolbar(content: appendButton)
@@ -35,7 +35,7 @@ struct NotesView: View {
 
     func appendButton() -> some View {
         Button("Add", systemImage: "square.and.pencil") {
-            model.createNote(title: "")
+            viewModel.createNote(title: "")
         }
     }
 
