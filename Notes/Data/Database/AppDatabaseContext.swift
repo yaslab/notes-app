@@ -27,23 +27,7 @@ class AppDatabaseContext {
 
             logger.info("Database file path: \(queue.path)")
 
-            try queue.write { db in
-                try db.create(table: NoteEntity.databaseTableName, options: .ifNotExists) { t in
-                    t.primaryKey("id", .text)
-                    t.column("title", .text).notNull()
-                    t.column("dueDate", .text)
-                    t.column("createdAt", .double).notNull()
-                    t.column("updatedAt", .double).notNull()
-                }
-                try db.create(table: NoteAttachmentEntity.databaseTableName, options: .ifNotExists) { t in
-                    t.primaryKey("id", .text)
-                    t.column("type", .text).notNull()
-                    t.column("data", .text).notNull()
-                    t.column("createdAt", .double).notNull()
-                    t.column("updatedAt", .double).notNull()
-                    t.belongsTo(NoteEntity.databaseTableName, onDelete: .cascade).notNull()
-                }
-            }
+            try AppDatabaseContext.migrator().migrate(queue)
 
             self.queue = queue
         } catch {
@@ -61,5 +45,11 @@ extension AppDatabaseContext {
         let file = dir.appending(component: "notes.sqlite")
 
         return file.path(percentEncoded: false)
+    }
+
+    static func migrator() -> DatabaseMigrator {
+        var migrator = DatabaseMigrator()
+        Migration20251015.register(&migrator)
+        return migrator
     }
 }
