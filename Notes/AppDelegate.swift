@@ -7,19 +7,7 @@
 
 import SwiftUI
 
-#if os(iOS)
-
-typealias AppDelegateAdaptor = UIApplicationDelegateAdaptor
-
-class AppDelegate: NSObject, UIApplicationDelegate {
-    // MARK: Initializing the app
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        return true
-    }
-}
-
-#else
+#if os(macOS)
 
 typealias AppDelegateAdaptor = NSApplicationDelegateAdaptor
 
@@ -42,6 +30,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         return
+    }
+}
+
+#else
+
+typealias AppDelegateAdaptor = UIApplicationDelegateAdaptor
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    // MARK: Initializing the app
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions options: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        return true
     }
 }
 
