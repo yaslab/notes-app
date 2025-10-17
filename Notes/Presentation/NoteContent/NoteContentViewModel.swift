@@ -93,7 +93,6 @@ class NoteContentViewModel {
                 .handleEvents(receiveCancel: { print("cancel") })
                 .sink { [weak self] value in
                     do {
-                        print(value)
                         try self?.noteAttachmentRepository.updateAttachment(data: value, for: attachment.id)
                     } catch {
                         // TODO: error handling

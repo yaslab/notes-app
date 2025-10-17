@@ -12,23 +12,36 @@ struct NotesView: View {
 
     var body: some View {
         NavigationStack {
-            @Bindable var mainViewModel = mainViewModel
-            List(selection: $mainViewModel.selection) {
-                ForEach($mainViewModel.notes) { $item in
-                    Text(title(for: item))
-                        .contextMenu {
-                            Button("Delete", systemImage: "trash") {
-                                mainViewModel.deleteNote(by: item.id)
-                            }
-                        }
-                        .id(item.id)
+            list()
+                .toolbar {
+                    ToolbarItem {
+                        appendButton()
+                    }
                 }
-                .onDelete { indices in
-                    mainViewModel.deleteNotes(by: indices)
-                }
-            }
-            .toolbar(content: appendButton)
         }
+    }
+
+    @ViewBuilder func list() -> some View {
+        @Bindable var mainViewModel = mainViewModel
+
+        List(selection: $mainViewModel.selection) {
+            ForEach(mainViewModel.notes) { note in
+                cell(note: note)
+                    .contextMenu {
+                        Button("Delete", systemImage: "trash") {
+                            mainViewModel.deleteNote(by: note.id)
+                        }
+                    }
+                    .id(note.id)
+            }
+            .onDelete { indices in
+                mainViewModel.deleteNotes(by: indices)
+            }
+        }
+    }
+
+    func cell(note: Note) -> some View {
+        Text(title(for: note))
     }
 
     func appendButton() -> some View {

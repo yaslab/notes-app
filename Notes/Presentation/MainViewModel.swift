@@ -63,10 +63,10 @@ class MainViewModel {
         }
     }
 
-    func deleteNotes(by sss: IndexSet) {
+    func deleteNotes(by indices: IndexSet) {
         do {
             // FIXME: Make the following loop into one transaction
-            let notesToDelete = sss.map { i in notes[i] }
+            let notesToDelete = indices.map { i in notes[i] }
             for note in notesToDelete {
                 try noteRepository.deleteNote(by: note.id)
             }
