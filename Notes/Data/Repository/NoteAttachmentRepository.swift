@@ -18,6 +18,13 @@ class NoteAttachmentRepository {
 }
 
 extension NoteAttachmentRepository {
+    func publisher(for note: Note) -> AnyPublisher<[NoteAttachment], Error> {
+        let observation = ValueObservation.tracking { try NoteEntity(from: note).attachments.fetchAll($0) }
+        return observation.publisher(in: database.queue)
+            .map { $0.map { $0.toModel() } }
+            .eraseToAnyPublisher()
+    }
+
     func fetchAttachments(for note: Note) throws -> [NoteAttachment] {
         try database.queue.read { db in
             try NoteEntity(from: note).attachments.fetchAll(db)

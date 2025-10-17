@@ -19,7 +19,7 @@ protocol Dependencies {
 
     func resolve() -> MainViewModel
     func resolve() -> NotesViewModel
-    func resolve(id: Note.ID) -> NoteContentViewModel
+    func resolve(note: Note) -> NoteContentViewModel
 }
 
 class DependenciesImpl: Dependencies {
@@ -54,19 +54,18 @@ class DependenciesImpl: Dependencies {
     }
 
     func resolve() -> MainViewModel {
-        return MainViewModel()
-    }
-
-    func resolve() -> NotesViewModel {
-        return NotesViewModel(
-            logger: resolve(),
+        return MainViewModel(
             noteRepository: resolve()
         )
     }
 
-    func resolve(id: Note.ID) -> NoteContentViewModel {
+    func resolve() -> NotesViewModel {
+        return NotesViewModel()
+    }
+
+    func resolve(note: Note) -> NoteContentViewModel {
         return NoteContentViewModel(
-            id: id,
+            note: note,
             noteRepository: resolve(),
             noteAttachmentRepository: resolve()
         )

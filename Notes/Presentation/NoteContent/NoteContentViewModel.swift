@@ -13,18 +13,19 @@ import Observation
 class NoteContentViewModel {
     // MARK: - Dependencies
 
-    private let id: Note.ID
+    private let note: Note
     private let noteRepository: NoteRepository
     private let noteAttachmentRepository: NoteAttachmentRepository
 
     init(
-        id: Note.ID,
+        note: Note,
         noteRepository: NoteRepository,
         noteAttachmentRepository: NoteAttachmentRepository
     ) {
-        self.id = id
+        self.note = note
         self.noteRepository = noteRepository
         self.noteAttachmentRepository = noteAttachmentRepository
+        self.bind()
     }
 
     // MARK: - Subscriptions
@@ -34,21 +35,18 @@ class NoteContentViewModel {
     @ObservationIgnored
     private var cancellables: Set<AnyCancellable> = []
 
+    func bind() {
+        noteAttachmentRepository.publisher(for: note)
+            .assertNoFailure()  // FIXME: Handle error properly
+            .assign(to: \.attachments, on: self)
+            .store(in: &cancellables)
+    }
+
     // MARK: - States
 
-    private(set) var note: Note? = nil
     var attachments: [NoteAttachment] = []
 
     // MARK: - Events
-
-    func onEditorAppear() {
-        do {
-            try syncNote()
-        } catch {
-            // TODO: error handling
-            print(error)
-        }
-    }
 
     func onEditorDisappear() {
         do {
@@ -63,8 +61,7 @@ class NoteContentViewModel {
 
     func onTitleUpdate(_ newValue: String) {
         do {
-            try noteRepository.updateNote(title: newValue, for: id)
-            try syncNote()
+            try noteRepository.updateNote(title: newValue, for: note.id)
         } catch {
             // TODO: error handling
             print(error)
@@ -74,11 +71,10 @@ class NoteContentViewModel {
     func onDueDateUpdate(_ newValue: DateOnly?) {
         do {
             if let newValue {
-                try noteRepository.updateNote(dueDate: newValue, for: id)
+                try noteRepository.updateNote(dueDate: newValue, for: note.id)
             } else {
-                try noteRepository.setDueDateToNull(for: id)
+                try noteRepository.setDueDateToNull(for: note.id)
             }
-            try syncNote()
         } catch {
             // TODO: error handling
             print(error)
@@ -99,7 +95,6 @@ class NoteContentViewModel {
                     do {
                         print(value)
                         try self?.noteAttachmentRepository.updateAttachment(data: value, for: attachment.id)
-                        try self?.syncNote()
                     } catch {
                         // TODO: error handling
                         print(error)
@@ -115,8 +110,7 @@ class NoteContentViewModel {
 
     func appendNewAttachment(type: NoteAttachmentType) {
         do {
-            try noteAttachmentRepository.createAttachment(type: type, data: "", to: id)
-            try syncNote()
+            try noteAttachmentRepository.createAttachment(type: type, data: "", to: note.id)
         } catch {
             // TODO: error handling
             print(error)
@@ -126,33 +120,9 @@ class NoteContentViewModel {
     func deleteAttachment(_ attachment: NoteAttachment) {
         do {
             _ = try noteAttachmentRepository.deleteAttachment(by: attachment.id)
-            try syncNote()
         } catch {
             // TODO: error handling
             print(error)
         }
-    }
-
-    // MARK: - UseCase
-
-    func fetchNote(id: Note.ID) throws -> (Note, [NoteAttachment])? {
-        guard let note = try noteRepository.fetchNote(by: id) else {
-            return nil
-        }
-
-        let attachments = try noteAttachmentRepository.fetchAttachments(for: note)
-
-        return (note, attachments)
-    }
-
-    // MARK: Common
-
-    func syncNote() throws {
-        guard let (note, attachments) = try fetchNote(id: id) else {
-            return
-        }
-
-        self.note = note
-        self.attachments = attachments
     }
 }

@@ -8,35 +8,28 @@
 import SwiftUI
 
 struct NoteContentEditorView: View {
-    let id: Note.ID
-
     @State var viewModel: NoteContentViewModel
     @State var isDueDatePickerPresented: Bool = false
 
-    init(id: Note.ID) {
-        self.id = id
-        self.viewModel = dependencies.resolve(id: id)
+    @Binding var note: Note
+
+    init(note: Binding<Note>) {
+        viewModel = dependencies.resolve(note: note.wrappedValue)
+        _note = note
     }
 
     var body: some View {
-        if let note = viewModel.note {
-            content(note: note)
-                .onDisappear {
-                    viewModel.onEditorDisappear()
-                }
-                .environment(viewModel)
-        } else {
-            Text("Loading...")
-                .onAppear {
-                    viewModel.onEditorAppear()
-                }
-        }
+        content()
+            .onDisappear {
+                viewModel.onEditorDisappear()
+            }
+            .environment(viewModel)
     }
 
-    func content(note: Note) -> some View {
+    func content() -> some View {
         ScrollView {
             LazyVStack {
-                contentHeader(note: note)
+                contentHeader()
 
                 contentBody()
 
@@ -46,7 +39,7 @@ struct NoteContentEditorView: View {
         }
     }
 
-    func contentHeader(note: Note) -> some View {
+    func contentHeader() -> some View {
         VStack {
             HStack(spacing: 0) {
                 Text("Created: \(note.createdAt.formatted())")
@@ -80,13 +73,10 @@ struct NoteContentEditorView: View {
                 Spacer()
             }
 
-            TextField(
-                "Title",
-                text: Binding(
-                    get: { note.title },
-                    set: { viewModel.onTitleUpdate($0) }
-                )
-            )
+            TextField("Title", text: $note.title)
+                .onChange(of: note.title) { oldValue, newValue in
+                    viewModel.onTitleUpdate(newValue)
+                }
         }
     }
 
