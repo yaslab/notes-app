@@ -68,6 +68,15 @@ class NoteContentViewModel {
         }
     }
 
+    func onPriorityUpdate(_ newValue: NotePriority) {
+        do {
+            try noteRepository.updateNote(priority: newValue, for: note.id)
+        } catch {
+            // TODO: error handling
+            print(error)
+        }
+    }
+
     func onDueDateUpdate(_ newValue: DateOnly?) {
         do {
             if let newValue {

@@ -9,3 +9,7 @@ enum NoteAttachmentType: String, Codable, Hashable, Sendable {
     case text
     case url
 }
+
+extension NoteAttachmentType: Identifiable {
+    var id: NoteAttachmentType { self }
+}

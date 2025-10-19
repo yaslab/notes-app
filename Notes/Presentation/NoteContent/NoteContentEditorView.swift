@@ -71,6 +71,15 @@ struct NoteContentEditorView: View {
                     viewModel.onDueDateUpdate(nil)
                 }
                 Spacer()
+                Picker("Priority", selection: $note.priority) {
+                    ForEach(NotePriority.allCases) { priority in
+                        Label(priority.labelTitle, systemImage: priority.systemImageName)
+                            .tag(priority)
+                    }
+                }
+                .onChange(of: note.priority) { oldValue, newValue in
+                    viewModel.onPriorityUpdate(newValue)
+                }
             }
 
             TextField("Title", text: $note.title)

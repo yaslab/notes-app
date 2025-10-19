@@ -43,11 +43,11 @@ class MainViewModel {
 
     // MARK: - Actions
 
-    func createNote(title: String) {
+    func createNote() {
         //logger.trace()
 
         do {
-            try noteRepository.createNote(title: title)
+            try noteRepository.createNote()
         } catch {
             // TODO: error handling
             print("\(error)")

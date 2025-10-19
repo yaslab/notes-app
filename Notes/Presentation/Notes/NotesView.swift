@@ -46,7 +46,7 @@ struct NotesView: View {
 
     func appendButton() -> some View {
         Button("Add", systemImage: "square.and.pencil") {
-            mainViewModel.createNote(title: "")
+            mainViewModel.createNote()
         }
     }
 

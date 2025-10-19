@@ -31,11 +31,12 @@ extension NoteRepository {
         }
     }
 
-    func createNote(title: String) throws {
+    func createNote() throws {
         let date = Date()
         let entity = NoteEntity(
             id: UUID(),
-            title: title,
+            title: "",
+            priority: .medium,
             createdAt: date,
             updatedAt: date
         )
@@ -45,7 +46,12 @@ extension NoteRepository {
         }
     }
 
-    func updateNote(title: String? = nil, dueDate: DateOnly? = nil, for noteId: Note.ID) throws {
+    func updateNote(
+        title: String? = nil,
+        priority: NotePriority? = nil,
+        dueDate: DateOnly? = nil,
+        for noteId: Note.ID
+    ) throws {
         try database.queue.write { db in
             guard var entity = try NoteEntity.fetchOne(db, key: noteId.rawValue) else {
                 return
@@ -55,6 +61,10 @@ extension NoteRepository {
                 var changed = false
                 if let title, $0.title != title {
                     $0.title = title
+                    changed = true
+                }
+                if let priority, $0.priority != priority {
+                    $0.priority = priority
                     changed = true
                 }
                 if let dueDate, $0.dueDate != dueDate {

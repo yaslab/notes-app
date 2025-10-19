@@ -9,7 +9,7 @@ import Foundation
 import GRDB
 
 struct NoteAttachmentEntity: Codable, FetchableRecord, PersistableRecord {
-    static let databaseTableName = "note_attachment"
+    static let databaseTableName = "NoteAttachment"
 
     static func databaseUUIDEncodingStrategy(for column: String) -> DatabaseUUIDEncodingStrategy {
         return .lowercaseString

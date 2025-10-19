@@ -9,7 +9,7 @@ import Foundation
 import GRDB
 
 struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
-    static let databaseTableName = "note"
+    static let databaseTableName = "Note"
 
     static func databaseUUIDEncodingStrategy(for column: String) -> DatabaseUUIDEncodingStrategy {
         return .lowercaseString
@@ -31,6 +31,7 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
 
     enum Columns {
         static let title = Column("title")
+        static let priority = Column("priority")
         static let dueDate = Column("dueDate")
         static let createdAt = Column("createdAt")
         static let updatedAt = Column("updatedAt")
@@ -38,6 +39,7 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
 
     var id: UUID
     var title: String
+    var priority: NotePriority
     var dueDate: DateOnly?
     var createdAt: Date
     var updatedAt: Date
@@ -47,6 +49,7 @@ extension NoteEntity {
     init(from model: Note) {
         self.id = model.id.rawValue
         self.title = model.title
+        self.priority = model.priority
         self.dueDate = model.dueDate
         self.createdAt = model.createdAt
         self.updatedAt = model.updatedAt
@@ -56,6 +59,7 @@ extension NoteEntity {
         return Note(
             id: Note.ID(rawValue: id),
             title: title,
+            priority: priority,
             dueDate: dueDate,
             createdAt: createdAt,
             updatedAt: updatedAt

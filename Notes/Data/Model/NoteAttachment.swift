@@ -24,7 +24,14 @@ struct NoteAttachment: Identifiable, Hashable, Sendable {
 
     var noteId: Note.ID
 
-    nonisolated init(id: ID, type: NoteAttachmentType, data: String, createdAt: Date, updatedAt: Date, belongsTo noteId: Note.ID) {
+    nonisolated init(
+        id: ID,
+        type: NoteAttachmentType,
+        data: String,
+        createdAt: Date,
+        updatedAt: Date,
+        belongsTo noteId: Note.ID
+    ) {
         self.id = id
         self.type = type
         self.data = data
