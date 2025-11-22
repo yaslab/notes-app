@@ -40,7 +40,7 @@ struct NoteEntity: Codable, FetchableRecord, PersistableRecord {
     var id: UUID
     var title: String
     var priority: NotePriority
-    var dueDate: DateOnly?
+    var dueDate: DateOnlyDatabaseValue?
     var createdAt: Date
     var updatedAt: Date
 }
@@ -50,7 +50,7 @@ extension NoteEntity {
         self.id = model.id.rawValue
         self.title = model.title
         self.priority = model.priority
-        self.dueDate = model.dueDate
+        self.dueDate = DateOnlyDatabaseValue(from: model.dueDate)
         self.createdAt = model.createdAt
         self.updatedAt = model.updatedAt
     }
@@ -60,7 +60,7 @@ extension NoteEntity {
             id: Note.ID(rawValue: id),
             title: title,
             priority: priority,
-            dueDate: dueDate,
+            dueDate: dueDate?.toModel(),
             createdAt: createdAt,
             updatedAt: updatedAt
         )

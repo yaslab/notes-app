@@ -28,7 +28,9 @@ struct NoteContentDueDatePicker: View {
                     dismiss()
                 }
                 Button("Set") {
-                    onSubmit(DateOnly(from: selection))
+                    if let date = DateOnly(from: selection) {
+                        onSubmit(date)
+                    }
                     dismiss()
                 }
             }

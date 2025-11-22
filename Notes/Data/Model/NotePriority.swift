@@ -26,7 +26,7 @@ extension NotePriority {
             return "Low"
         }
     }
-    
+
     var systemImageName: String {
         switch self {
         case .high:

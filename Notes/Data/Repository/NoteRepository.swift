@@ -67,8 +67,8 @@ extension NoteRepository {
                     $0.priority = priority
                     changed = true
                 }
-                if let dueDate, $0.dueDate != dueDate {
-                    $0.dueDate = dueDate
+                if let dueDate, $0.dueDate?.toModel() != dueDate {
+                    $0.dueDate = DateOnlyDatabaseValue(from: dueDate)
                     changed = true
                 }
                 if changed {
